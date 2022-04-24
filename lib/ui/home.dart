@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gallery/model/model.info.dart';
 import 'package:gallery/service/api.dart';
+import 'package:gallery/ui/card.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -65,6 +66,8 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){}, backgroundColor: Colors.orange.shade500,child: const Icon(Icons.favorite_sharp,),),
       body: Container(
         height: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -81,19 +84,39 @@ class _HomeState extends State<Home> {
                       children: [
                         GridView.custom(
                           shrinkWrap: true,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 2 / 3,
+                          gridDelegate: SliverWovenGridDelegate.count(
+                            crossAxisCount: 3,
                             crossAxisSpacing: .6,
                             mainAxisSpacing: .6,
+                            pattern: const [
+                              WovenGridTile(
+                                2 / 3,
+                                alignment: AlignmentDirectional.center,
+                              ),
+                              WovenGridTile(
+                                5 / 7,
+                                crossAxisRatio: .9,
+                                alignment: AlignmentDirectional.center,
+                              ),
+                            ],
                           ),
                           childrenDelegate: SliverChildBuilderDelegate(
                             ((context, index) {
                               return Stack(
                                 children: [
                                   InkWell(
-                                    onTap: (){},
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const PexelCard(),
+                                              settings: RouteSettings(
+                                                  arguments: data[index])));
+                                    },
+                                    onLongPress: () {
+                                      _alert(context, index);
+                                    },
                                     child: Container(
                                       clipBehavior: Clip.hardEdge,
                                       padding: const EdgeInsets.all(5),
@@ -105,7 +128,7 @@ class _HomeState extends State<Home> {
                                         fit: BoxFit.fill,
                                         errorBuilder: (context, obj, error) {
                                           return const Text(
-                                              "error loading image");
+                                              "Error loading image");
                                         },
                                       ),
                                     ),
@@ -123,5 +146,26 @@ class _HomeState extends State<Home> {
               ),
       ),
     );
+  }
+
+  _alert(context, index) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            elevation: 48,
+            insetPadding: const EdgeInsets.all(8),
+            child: ListTile(
+              title: SizedBox(
+                height: 40,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [Text("Photographer"), Divider(thickness: 1)],
+                ),
+              ),
+              subtitle: Text(data[index].photographer),
+            ),
+          );
+        });
   }
 }
