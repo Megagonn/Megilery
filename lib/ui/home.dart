@@ -108,16 +108,16 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 cursorColor: Colors.grey.shade500,
-                onSubmitted: (textEditingController) {
-                  // setState(() {
-                  //   data.clear();
-                  //   url =
-                  //       "https://api.pexels.com/v1/search?query=$textEditingController&per_page=27";
-                  // });
+                onSubmitted: (text) {
+                  // data.clear();
+                  textEditingController.clear();
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: ((context) => Search(searchQuery: textEditingController,)),));
+                        builder: ((context) => Search(
+                              searchQuery: text,
+                            )),
+                      ));
                   // getData();
                 },
               ),
