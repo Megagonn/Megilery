@@ -15,15 +15,10 @@ class PexelCard extends StatefulWidget {
 
 class _PexelCardState extends State<PexelCard> {
   bool myFavourite = false;
-  // getFavourites() async {
-  //   var favourites = await MyDb.db.getDatabaseInfo();
-  //   return favourites;
-  // }
 
   @override
   void initState() {
     super.initState();
-    // getFavourites();
   }
 
   @override
@@ -74,13 +69,13 @@ class _PexelCardState extends State<PexelCard> {
                             }
                           },
                           icon: myFavourite
-                              ? const Icon(
+                              ? Icon(
                                   Icons.favorite_sharp,
-                                  color: Colors.orange,
+                                  color: Colors.brown.shade600,
                                 )
-                              : const Icon(
+                              : Icon(
                                   Icons.favorite_border_outlined,
-                                  color: Colors.orange,
+                                  color: Colors.brown.shade600,
                                 ),
                         ),
                       ),
@@ -98,9 +93,9 @@ class _PexelCardState extends State<PexelCard> {
                               _alert(context, e);
                             }
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.download,
-                            color: Colors.orange,
+                            color: Colors.brown.shade600,
                           ),
                         ),
                       ),
@@ -127,9 +122,9 @@ class _PexelCardState extends State<PexelCard> {
                                   height: 100),
                             );
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.share_sharp,
-                            color: Colors.orange,
+                            color: Colors.brown.shade600,
                           ),
                         ),
                       ),

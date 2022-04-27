@@ -91,7 +91,7 @@ class _FavouritesState extends State<Favourites> {
                                     ),
                                   ),
                                   Positioned(
-                                    top: 217,
+                                    bottom: 15,
                                     left: 72,
                                     child: CircleAvatar(
                                       backgroundColor:
@@ -111,7 +111,7 @@ class _FavouritesState extends State<Favourites> {
                                         },
                                         icon: Icon(
                                           Icons.download,
-                                          color: Colors.orange.shade200,
+                                          color: Colors.brown.shade600,
                                         ),
                                       ),
                                     ),

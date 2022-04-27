@@ -20,7 +20,25 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<Pexel> data = [];
   ScrollController scrollController = ScrollController();
-  var url = 'https://api.pexels.com/v1/curated?page=2&per_page=6';
+  bool isLargeScreen() {
+    if (MediaQuery.of(context).size.width >= 600) {
+      return true;
+    }else{
+    return false;
+
+    }
+  }
+
+  bool isSmallScreen() {
+    if (MediaQuery.of(context).size.width < 300) {
+      return true;
+    }else{
+    return false;
+
+    }
+  }
+
+  var url = 'https://api.pexels.com/v1/curated?page=2&per_page=27';
   getData() async {
     var api = Uri.parse(url);
     var auth = "563492ad6f91700001000001b6db29ebe1e0450bb881d9d19d7f5e75";
@@ -62,12 +80,15 @@ class _HomeState extends State<Home> {
         getData();
       }
     });
+    
   }
 
   TextEditingController textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    isLargeScreen();
+    isSmallScreen();
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -138,7 +159,11 @@ class _HomeState extends State<Home> {
                               GridView.custom(
                                 shrinkWrap: true,
                                 gridDelegate: SliverWovenGridDelegate.count(
-                                  crossAxisCount: 3,
+                                  crossAxisCount: isSmallScreen()
+                                      ? 2
+                                      : isLargeScreen()
+                                          ? 5
+                                          : 3,
                                   crossAxisSpacing: .6,
                                   mainAxisSpacing: .6,
                                   pattern: const [
