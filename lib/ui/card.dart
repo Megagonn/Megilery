@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:gallery/model/model.db.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:share_plus/share_plus.dart';
 
 class PexelCard extends StatefulWidget {
   const PexelCard({Key? key}) : super(key: key);
@@ -13,6 +15,17 @@ class PexelCard extends StatefulWidget {
 
 class _PexelCardState extends State<PexelCard> {
   bool myFavourite = false;
+  // getFavourites() async {
+  //   var favourites = await MyDb.db.getDatabaseInfo();
+  //   return favourites;
+  // }
+
+  @override
+  void initState() {
+    super.initState();
+    // getFavourites();
+  }
+
   @override
   Widget build(BuildContext context) {
     dynamic pexel = ModalRoute.of(context)!.settings.arguments;
@@ -44,19 +57,21 @@ class _PexelCardState extends State<PexelCard> {
                             setState(() {
                               myFavourite = !myFavourite;
                             });
-                            // SharedPreferences pref =
-                            //     await SharedPreferences.getInstance();
-                            // var favouritesStore =
-                            //     jsonDecode(pref.getString('key')!);
+                            SharedPreferences pref =
+                                await SharedPreferences.getInstance();
+                            var favouritesStore =
+                                (pref.getStringList('favourite'));
 
-                            // if (favouritesStore.isEmpty) {
-                            //   pref.setString('key', jsonEncode([pexel]));
-                            // } else {
-                            //   favouritesStore.add(pexel);
-                            //   pref.setString(
-                            //       'key', jsonEncode(favouritesStore));
-                            // }
-                            
+                            if (favouritesStore == null) {
+                              pref.setStringList(
+                                  'favourite', ([pexel.portrait]));
+                            } else {
+                              if (!favouritesStore.contains(pexel.portrait)) {
+                                favouritesStore.add(pexel.portrait);
+                                pref.setStringList(
+                                    'favourite', (favouritesStore));
+                              }
+                            }
                           },
                           icon: myFavourite
                               ? const Icon(
@@ -77,26 +92,43 @@ class _PexelCardState extends State<PexelCard> {
                                 pexel.original,
                                 albumName: 'media');
                             try {
-                              showBottomSheet(
-                                  context: context,
-                                  builder: (context) {
-                                    return SnackBar(
-                                        backgroundColor: Colors.grey.shade200,
-                                        padding: const EdgeInsets.all(8),
-                                        elevation: 12,
-                                        duration: const Duration(seconds: 2),
-                                        content: response == null
-                                            ? const Text(
-                                                "Image saved successfully")
-                                            : const Text("Image not saved"));
-                                  });
+                              alert(context, response);
                             } catch (e) {
                               // TODO
-                              print(e.toString());
+                              _alert(context, e);
                             }
                           },
                           icon: const Icon(
                             Icons.download,
+                            color: Colors.orange,
+                          ),
+                        ),
+                      ),
+                      CircleAvatar(
+                        backgroundColor: Colors.grey.shade100.withAlpha(100),
+                        child: IconButton(
+                          onPressed: () async {
+                            print('i want to share');
+                            // var response = await GallerySaver.saveImage(
+                            //     pexel.original,
+                            //     albumName: 'media');
+                            // try {
+                            //   alert(context, response);
+                            // } catch (e) {
+                            //   // TODO
+                            //   _alert(context, e);
+                            // }
+                            Share.shareFiles(
+                              [pexel.portrait],
+                              mimeTypes: [],
+                              sharePositionOrigin: Rect.fromCenter(
+                                  center: const Offset(100, 100),
+                                  width: 100,
+                                  height: 100),
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.share_sharp,
                             color: Colors.orange,
                           ),
                         ),
@@ -109,4 +141,32 @@ class _PexelCardState extends State<PexelCard> {
       ),
     );
   }
+}
+
+alert(context, response) {
+  showBottomSheet(
+      context: context,
+      builder: (context) {
+        return SnackBar(
+            backgroundColor: Colors.grey.shade200,
+            padding: const EdgeInsets.all(8),
+            elevation: 12,
+            duration: const Duration(seconds: 2),
+            content: response == null
+                ? const Text("Image saved successfully")
+                : const Text("Image not saved"));
+      });
+}
+
+_alert(context, e) {
+  showBottomSheet(
+      context: context,
+      builder: (context) {
+        return SnackBar(
+            backgroundColor: Colors.grey.shade200,
+            padding: const EdgeInsets.all(8),
+            elevation: 12,
+            duration: const Duration(seconds: 2),
+            content: Text(e.toString()));
+      });
 }

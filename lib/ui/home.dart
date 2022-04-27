@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:gallery/model/model.info.dart';
 import 'package:gallery/service/api.dart';
 import 'package:gallery/ui/card.dart';
+import 'package:gallery/ui/favourites.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+
+import 'searchpage.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -33,7 +36,6 @@ class _HomeState extends State<Home> {
       var json = jsonDecode(response.body);
       var list = json['photos'] as List;
       url = json['next_page'];
-      // print(list);
       for (var i = 0; i < list.length; i++) {
         var element = list[i];
         var photo = Pexel.toMap(element);
@@ -41,7 +43,6 @@ class _HomeState extends State<Home> {
           data.add(photo);
         });
       }
-
       print(data.length);
       return data;
     } catch (e) {
@@ -63,87 +64,145 @@ class _HomeState extends State<Home> {
     });
   }
 
+  TextEditingController textEditingController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: (){}, backgroundColor: Colors.orange.shade500,child: const Icon(Icons.favorite_sharp,),),
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const Favourites()));
+        },
+        backgroundColor: Colors.brown.shade500,
+        child: const Icon(
+          Icons.favorite_sharp,
+        ),
+      ),
       body: Container(
         height: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        child: data.isEmpty
-            ? const CircularProgressIndicator.adaptive()
-            : Scrollbar(
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: RefreshIndicator(
-                    onRefresh: () async {
-                      setState(() {});
-                    },
-                    child: Column(
-                      children: [
-                        GridView.custom(
-                          shrinkWrap: true,
-                          gridDelegate: SliverWovenGridDelegate.count(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: .6,
-                            mainAxisSpacing: .6,
-                            pattern: const [
-                              WovenGridTile(
-                                2 / 3,
-                                alignment: AlignmentDirectional.center,
-                              ),
-                              WovenGridTile(
-                                5 / 7,
-                                crossAxisRatio: .9,
-                                alignment: AlignmentDirectional.center,
+        child: Column(
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: 50,
+              child: TextField(
+                controller: textEditingController,
+                decoration: InputDecoration(
+                  isDense: true,
+                  suffix: const Icon(
+                    Icons.search_outlined,
+                    color: Colors.grey,
+                  ),
+                  suffixIconConstraints: const BoxConstraints(
+                    maxWidth: 20,
+                    maxHeight: 20,
+                  ),
+                  hintText: "Search images",
+                  fillColor: Colors.white,
+                  filled: true,
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                cursorColor: Colors.grey.shade500,
+                onSubmitted: (textEditingController) {
+                  // setState(() {
+                  //   data.clear();
+                  //   url =
+                  //       "https://api.pexels.com/v1/search?query=$textEditingController&per_page=27";
+                  // });
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: ((context) => Search(searchQuery: textEditingController,)),));
+                  // getData();
+                },
+              ),
+            ),
+            data.isEmpty
+                ? const CircularProgressIndicator.adaptive()
+                : Scrollbar(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height - 70,
+                      child: SingleChildScrollView(
+                        controller: scrollController,
+                        child: RefreshIndicator(
+                          onRefresh: () async {
+                            setState(() {});
+                          },
+                          child: Column(
+                            children: [
+                              GridView.custom(
+                                shrinkWrap: true,
+                                gridDelegate: SliverWovenGridDelegate.count(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: .6,
+                                  mainAxisSpacing: .6,
+                                  pattern: const [
+                                    WovenGridTile(
+                                      2 / 3,
+                                      alignment: AlignmentDirectional.center,
+                                    ),
+                                    WovenGridTile(
+                                      5 / 7,
+                                      crossAxisRatio: .9,
+                                      alignment: AlignmentDirectional.center,
+                                    ),
+                                  ],
+                                ),
+                                childrenDelegate: SliverChildBuilderDelegate(
+                                  ((context, index) {
+                                    return Stack(
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const PexelCard(),
+                                                    settings: RouteSettings(
+                                                        arguments:
+                                                            data[index])));
+                                          },
+                                          onLongPress: () {
+                                            _alert(context, index);
+                                          },
+                                          child: Container(
+                                            clipBehavior: Clip.hardEdge,
+                                            padding: const EdgeInsets.all(5),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                            ),
+                                            child: Image.network(
+                                              data[index].portrait,
+                                              fit: BoxFit.fill,
+                                              errorBuilder:
+                                                  (context, obj, error) {
+                                                return const Text(
+                                                    "Error loading image");
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }),
+                                  childCount: data.length,
+                                ),
                               ),
                             ],
                           ),
-                          childrenDelegate: SliverChildBuilderDelegate(
-                            ((context, index) {
-                              return Stack(
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const PexelCard(),
-                                              settings: RouteSettings(
-                                                  arguments: data[index])));
-                                    },
-                                    onLongPress: () {
-                                      _alert(context, index);
-                                    },
-                                    child: Container(
-                                      clipBehavior: Clip.hardEdge,
-                                      padding: const EdgeInsets.all(5),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
-                                      ),
-                                      child: Image.network(
-                                        data[index].portrait,
-                                        fit: BoxFit.fill,
-                                        errorBuilder: (context, obj, error) {
-                                          return const Text(
-                                              "Error loading image");
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }),
-                            childCount: data.length,
-                          ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
+          ],
+        ),
       ),
     );
   }

@@ -30,9 +30,7 @@ class MyDb {
   //---------Get the data from the database-------
   getDatabaseInfo() async {
     var db = await database;
-
     var info = await db.query('favourite');
-
     if (info.isEmpty) {
       return null;
     } else {
