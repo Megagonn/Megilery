@@ -1,13 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gallery/model/model.info.dart';
 import 'package:gallery/service/api.dart';
 import 'package:gallery/ui/card.dart';
 import 'package:gallery/ui/favourites.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-
+import 'package:flutter_offline/flutter_offline.dart';
 import 'searchpage.dart';
 
 class Home extends StatefulWidget {
@@ -23,18 +24,16 @@ class _HomeState extends State<Home> {
   bool isLargeScreen() {
     if (MediaQuery.of(context).size.width >= 600) {
       return true;
-    }else{
-    return false;
-
+    } else {
+      return false;
     }
   }
 
   bool isSmallScreen() {
     if (MediaQuery.of(context).size.width < 300) {
       return true;
-    }else{
-    return false;
-
+    } else {
+      return false;
     }
   }
 
@@ -80,7 +79,6 @@ class _HomeState extends State<Home> {
         getData();
       }
     });
-    
   }
 
   TextEditingController textEditingController = TextEditingController();
@@ -100,134 +98,170 @@ class _HomeState extends State<Home> {
           Icons.favorite_sharp,
         ),
       ),
-      body: Container(
-        height: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        child: Column(
-          children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: 50,
-              child: TextField(
-                controller: textEditingController,
-                decoration: InputDecoration(
-                  isDense: true,
-                  suffix: const Icon(
-                    Icons.search_outlined,
-                    color: Colors.grey,
-                  ),
-                  suffixIconConstraints: const BoxConstraints(
-                    maxWidth: 20,
-                    maxHeight: 20,
-                  ),
-                  hintText: "Search images",
-                  fillColor: Colors.white,
-                  filled: true,
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                cursorColor: Colors.grey.shade500,
-                onSubmitted: (text) {
-                  // data.clear();
-                  textEditingController.clear();
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: ((context) => Search(
-                              searchQuery: text,
-                            )),
-                      ));
-                  // getData();
-                },
-              ),
-            ),
-            data.isEmpty
-                ? const CircularProgressIndicator.adaptive()
-                : Scrollbar(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height - 70,
-                      child: SingleChildScrollView(
-                        controller: scrollController,
-                        child: RefreshIndicator(
-                          onRefresh: () async {
-                            setState(() {});
+      body: OfflineBuilder(
+        connectivityBuilder: (context, connectivity, child) {
+          final bool connected = connectivity != ConnectivityResult.none;
+          return connected
+              ? renderPage()
+              : Container(
+                  // color: const Color(0xFFEE4400),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Center(
+                        child: Text('OFFLINE'),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: SpinKitFoldingCube(
+                          size: 50,
+                          itemBuilder: (BuildContext context, int index) {
+                            return DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: Colors.brown.shade500,
+                              ),
+                            );
                           },
-                          child: Column(
-                            children: [
-                              GridView.custom(
-                                shrinkWrap: true,
-                                gridDelegate: SliverWovenGridDelegate.count(
-                                  crossAxisCount: isSmallScreen()
-                                      ? 2
-                                      : isLargeScreen()
-                                          ? 5
-                                          : 3,
-                                  crossAxisSpacing: .6,
-                                  mainAxisSpacing: .6,
-                                  pattern: const [
-                                    WovenGridTile(
-                                      2 / 3,
-                                      alignment: AlignmentDirectional.center,
-                                    ),
-                                    WovenGridTile(
-                                      5 / 7,
-                                      crossAxisRatio: .9,
-                                      alignment: AlignmentDirectional.center,
-                                    ),
-                                  ],
-                                ),
-                                childrenDelegate: SliverChildBuilderDelegate(
-                                  ((context, index) {
-                                    return Stack(
-                                      children: [
-                                        InkWell(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const PexelCard(),
-                                                    settings: RouteSettings(
-                                                        arguments:
-                                                            data[index])));
-                                          },
-                                          onLongPress: () {
-                                            _alert(context, index);
-                                          },
-                                          child: Container(
-                                            clipBehavior: Clip.hardEdge,
-                                            padding: const EdgeInsets.all(5),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                            ),
-                                            child: Image.network(
-                                              data[index].portrait,
-                                              fit: BoxFit.fill,
-                                              errorBuilder:
-                                                  (context, obj, error) {
-                                                return const Text(
-                                                    "Error loading image");
-                                              },
-                                            ),
+                        ),
+                      ),
+                      const Text('Waiting for a network connection...\nKindly connect to a WiFi or on your mobile network.', textAlign: TextAlign.center,)
+                    ],
+                  ),
+                );
+          // Stac
+        },
+        child: const Text('data'),
+      ),
+    );
+  }
+
+  Widget renderPage() {
+    return Container(
+      height: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      child: Column(
+        children: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: 50,
+            child: TextField(
+              controller: textEditingController,
+              decoration: InputDecoration(
+                isDense: true,
+                suffix: const Icon(
+                  Icons.search_outlined,
+                  color: Colors.grey,
+                ),
+                suffixIconConstraints: const BoxConstraints(
+                  maxWidth: 20,
+                  maxHeight: 20,
+                ),
+                hintText: "Search images",
+                fillColor: Colors.white,
+                filled: true,
+                border: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              cursorColor: Colors.grey.shade500,
+              onSubmitted: (text) {
+                // data.clear();
+                textEditingController.clear();
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: ((context) => Search(
+                            searchQuery: text,
+                          )),
+                    ));
+                // getData();
+              },
+            ),
+          ),
+          data.isEmpty
+              ? const CircularProgressIndicator.adaptive()
+              : Scrollbar(
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height - 70,
+                    child: SingleChildScrollView(
+                      controller: scrollController,
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          setState(() {});
+                        },
+                        child: Column(
+                          children: [
+                            GridView.custom(
+                              shrinkWrap: true,
+                              gridDelegate: SliverWovenGridDelegate.count(
+                                crossAxisCount: isSmallScreen()
+                                    ? 2
+                                    : isLargeScreen()
+                                        ? 5
+                                        : 3,
+                                crossAxisSpacing: .6,
+                                mainAxisSpacing: .6,
+                                pattern: const [
+                                  WovenGridTile(
+                                    2 / 3,
+                                    alignment: AlignmentDirectional.center,
+                                  ),
+                                  WovenGridTile(
+                                    5 / 7,
+                                    crossAxisRatio: .9,
+                                    alignment: AlignmentDirectional.center,
+                                  ),
+                                ],
+                              ),
+                              childrenDelegate: SliverChildBuilderDelegate(
+                                ((context, index) {
+                                  return Stack(
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const PexelCard(),
+                                                  settings: RouteSettings(
+                                                      arguments: data[index])));
+                                        },
+                                        onLongPress: () {
+                                          _alert(context, index);
+                                        },
+                                        child: Container(
+                                          clipBehavior: Clip.hardEdge,
+                                          padding: const EdgeInsets.all(5),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                          ),
+                                          child: Image.network(
+                                            data[index].portrait,
+                                            fit: BoxFit.fill,
+                                            errorBuilder:
+                                                (context, obj, error) {
+                                              return const Text(
+                                                  "Error loading image");
+                                            },
                                           ),
                                         ),
-                                      ],
-                                    );
-                                  }),
-                                  childCount: data.length,
-                                ),
+                                      ),
+                                    ],
+                                  );
+                                }),
+                                childCount: data.length,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-          ],
-        ),
+                ),
+        ],
       ),
     );
   }
