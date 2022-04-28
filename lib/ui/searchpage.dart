@@ -43,7 +43,6 @@ class _SearchState extends State<Search> {
           data.add(photo);
         });
       }
-      print(data.length);
       return data;
     } catch (e) {
       ScaffoldMessenger.of(context)
@@ -85,44 +84,6 @@ class _SearchState extends State<Search> {
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         child: Column(
           children: [
-            // SizedBox(
-            //   width: MediaQuery.of(context).size.width,
-            //   height: 50,
-            //   child: TextField(
-            //     controller: textEditingController,
-            //     decoration: InputDecoration(
-            //       isDense: true,
-            //       suffix: const Icon(
-            //         Icons.search_outlined,
-            //         color: Colors.grey,
-            //       ),
-            //       suffixIconConstraints: const BoxConstraints(
-            //         maxWidth: 20,
-            //         maxHeight: 20,
-            //       ),
-            //       hintText: "Search images",
-            //       fillColor: Colors.white,
-            //       filled: true,
-            //       border: OutlineInputBorder(
-            //         borderSide: BorderSide.none,
-            //         borderRadius: BorderRadius.circular(30),
-            //       ),
-            //     ),
-            //     cursorColor: Colors.grey.shade500,
-            //     onSubmitted: (textEditingController) {
-            //       // setState(() {
-            //       //   data.clear();
-            //       //   url =
-            //       //       "https://api.pexels.com/v1/search?query=$textEditingController&per_page=27";
-            //       // });
-            //       Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //               builder: ((context) => Search(searchQuery: textEditingController,)),));
-            //       // getData();
-            //     },
-            //   ),
-            // ),
             data.isEmpty
                 ? const CircularProgressIndicator.adaptive()
                 : Scrollbar(

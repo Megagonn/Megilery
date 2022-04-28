@@ -1,7 +1,5 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:gallery/model/model.db.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
@@ -24,14 +22,14 @@ class _PexelCardState extends State<PexelCard> {
   @override
   Widget build(BuildContext context) {
     dynamic pexel = ModalRoute.of(context)!.settings.arguments;
-    // print(pexel.alt);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-            title: Text(
-          pexel.alt.toString().toUpperCase(),
-          overflow: TextOverflow.ellipsis,
-        )),
+          title: Text(
+            pexel.alt.toString().toUpperCase(),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
         body: Stack(
           children: [
             Container(
@@ -84,11 +82,14 @@ class _PexelCardState extends State<PexelCard> {
                         child: IconButton(
                           onPressed: () async {
                             var response = await GallerySaver.saveImage(
-                                pexel.original,
-                                albumName: 'media');
+                              pexel.portrait,
+                              albumName: 'media',
+                              toDcim: true,
+                            );
                             try {
                               alert(context, response);
                             } catch (e) {
+                              // ignore: todo
                               // TODO
                               _alert(context, e);
                             }

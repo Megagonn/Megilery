@@ -18,6 +18,7 @@ class _FavouritesState extends State<Favourites> {
 
   @override
   void initState() {
+    // ignore: todo
     // TODO: implement initState
     super.initState();
     getFavourites();
@@ -59,7 +60,6 @@ class _FavouritesState extends State<Favourites> {
                     child: CircularProgressIndicator.adaptive());
               } else {
                 var favourite = snapshot.data;
-                print(favourite);
                 return SingleChildScrollView(
                   child: GridView.builder(
                       shrinkWrap: true,
@@ -105,6 +105,7 @@ class _FavouritesState extends State<Favourites> {
                                           try {
                                             alert(context, response);
                                           } catch (e) {
+                                            // ignore: todo
                                             // TODO
                                             _alert(context, e);
                                           }

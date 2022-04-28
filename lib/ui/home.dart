@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gallery/model/model.info.dart';
-import 'package:gallery/service/api.dart';
 import 'package:gallery/ui/card.dart';
 import 'package:gallery/ui/favourites.dart';
 import 'package:http/http.dart' as http;
@@ -60,7 +59,6 @@ class _HomeState extends State<Home> {
           data.add(photo);
         });
       }
-      print(data.length);
       return data;
     } catch (e) {
       ScaffoldMessenger.of(context)
@@ -70,6 +68,7 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
+    // ignore: todo
     // TODO: implement initState
     super.initState();
     getData();
@@ -128,7 +127,6 @@ class _HomeState extends State<Home> {
                     ],
                   ),
                 );
-          // Stac
         },
         child: const Text('data'),
       ),
