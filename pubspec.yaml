@@ -27,6 +27,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  animated_splash_screen: ^1.2.0
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
@@ -36,6 +37,7 @@ dependencies:
   gallery_saver: ^2.1.1
   http: ^0.13.4
   path_provider: ^2.0.9
+  rename: ^2.0.1
   share_plus: ^4.0.4
   shared_preferences: ^2.0.13
   sqflite: ^2.0.2+1
