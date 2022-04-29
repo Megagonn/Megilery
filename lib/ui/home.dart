@@ -86,49 +86,54 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     isLargeScreen();
     isSmallScreen();
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const Favourites()));
-        },
-        backgroundColor: Colors.brown.shade500,
-        child: const Icon(
-          Icons.favorite_sharp,
+    return SafeArea(
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const Favourites()));
+          },
+          backgroundColor: Colors.brown.shade500,
+          child: const Icon(
+            Icons.favorite_sharp,
+          ),
         ),
-      ),
-      body: OfflineBuilder(
-        connectivityBuilder: (context, connectivity, child) {
-          final bool connected = connectivity != ConnectivityResult.none;
-          return connected
-              ? renderPage()
-              : Container(
-                  // color: const Color(0xFFEE4400),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Center(
-                        child: Text('OFFLINE'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: SpinKitFoldingCube(
-                          size: 50,
-                          itemBuilder: (BuildContext context, int index) {
-                            return DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: Colors.brown.shade500,
-                              ),
-                            );
-                          },
+        body: OfflineBuilder(
+          connectivityBuilder: (context, connectivity, child) {
+            final bool connected = connectivity != ConnectivityResult.none;
+            return connected
+                ? renderPage()
+                : Container(
+                    // color: const Color(0xFFEE4400),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Center(
+                          child: Text('OFFLINE'),
                         ),
-                      ),
-                      const Text('Waiting for a network connection...\nKindly connect to a WiFi or on your mobile network.', textAlign: TextAlign.center,)
-                    ],
-                  ),
-                );
-        },
-        child: const Text('data'),
+                        Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: SpinKitFoldingCube(
+                            size: 50,
+                            itemBuilder: (BuildContext context, int index) {
+                              return DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: Colors.brown.shade500,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const Text(
+                          'Waiting for a network connection...\nKindly connect to a WiFi or on your mobile network.',
+                          textAlign: TextAlign.center,
+                        )
+                      ],
+                    ),
+                  );
+          },
+          child: const Text('data'),
+        ),
       ),
     );
   }
@@ -165,14 +170,16 @@ class _HomeState extends State<Home> {
               cursorColor: Colors.grey.shade500,
               onSubmitted: (text) {
                 // data.clear();
-                textEditingController.clear();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: ((context) => Search(
-                            searchQuery: text,
-                          )),
-                    ));
+                if (textEditingController.text.isNotEmpty) {
+                  textEditingController.clear();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: ((context) => Search(
+                              searchQuery: text,
+                            )),
+                      ));
+                }
                 // getData();
               },
             ),
@@ -191,6 +198,7 @@ class _HomeState extends State<Home> {
                         child: Column(
                           children: [
                             GridView.custom(
+                              physics: const ScrollPhysics(),
                               shrinkWrap: true,
                               gridDelegate: SliverWovenGridDelegate.count(
                                 crossAxisCount: isSmallScreen()

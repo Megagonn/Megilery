@@ -98,6 +98,7 @@ class _SearchState extends State<Search> {
                           child: Column(
                             children: [
                               GridView.custom(
+                                physics: const ScrollPhysics(),
                                 shrinkWrap: true,
                                 gridDelegate: SliverWovenGridDelegate.count(
                                   crossAxisCount: 3,

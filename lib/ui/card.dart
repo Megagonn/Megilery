@@ -1,6 +1,11 @@
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
+import 'package:document_file_save_plus/document_file_save_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:gallery_saver/gallery_saver.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -33,11 +38,13 @@ class _PexelCardState extends State<PexelCard> {
         body: Stack(
           children: [
             Container(
-              padding: const EdgeInsets.all(0),
-              child: Image.network(pexel.portrait),
+              child: Image.network(pexel.portrait,
+                  fit: BoxFit.cover,
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width),
             ),
             Positioned(
-                top: MediaQuery.of(context).size.height - 100,
+                bottom: 25,
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: Row(
@@ -80,24 +87,13 @@ class _PexelCardState extends State<PexelCard> {
                       CircleAvatar(
                         backgroundColor: Colors.grey.shade100.withAlpha(100),
                         child: IconButton(
-                          onPressed: () async {
-                            var response = await GallerySaver.saveImage(
-                              pexel.portrait,
-                              albumName: 'media',
-                              toDcim: true,
-                            );
-                            try {
-                              alert(context, response);
-                            } catch (e) {
-                              // ignore: todo
-                              // TODO
-                              _alert(context, e);
-                            }
-                          },
                           icon: Icon(
                             Icons.download,
                             color: Colors.brown.shade600,
                           ),
+                          onPressed: () async {
+                            _saveImage(pexel.portrait, context);
+                          },
                         ),
                       ),
                       CircleAvatar(
@@ -105,22 +101,12 @@ class _PexelCardState extends State<PexelCard> {
                         child: IconButton(
                           onPressed: () async {
                             print('i want to share');
-                            // var response = await GallerySaver.saveImage(
-                            //     pexel.original,
-                            //     albumName: 'media');
-                            // try {
-                            //   alert(context, response);
-                            // } catch (e) {
-                            //   // TODO
-                            //   _alert(context, e);
-                            // }
-                            Share.shareFiles(
-                              [pexel.portrait],
-                              mimeTypes: [],
-                              sharePositionOrigin: Rect.fromCenter(
-                                  center: const Offset(100, 100),
-                                  width: 100,
-                                  height: 100),
+                            final box =
+                                context.findRenderObject() as RenderBox?;
+                            Share.share(
+                              pexel.portrait,
+                              sharePositionOrigin:
+                                  box!.localToGlobal(Offset.zero) & box.size,
                             );
                           },
                           icon: Icon(
@@ -136,6 +122,33 @@ class _PexelCardState extends State<PexelCard> {
         ),
       ),
     );
+  }
+}
+
+_askPermission() async {
+  if (Platform.isIOS) {
+    await Permission.photos.request();
+  } else {
+    await [Permission.storage].request();
+  }
+}
+
+_saveImage(String imageUrl, BuildContext context) async {
+  try {
+    await _askPermission();
+    var response = await Dio()
+        .get((imageUrl), options: (Options(responseType: ResponseType.bytes)));
+    final result = await ImageGallerySaver.saveImage(
+      Uint8List.fromList(response.data),
+      quality: 100,
+    );
+
+    // print(result);
+    alert(context, 'Download successful');
+  } catch (e) {
+    // ignore: todo
+    // TODO
+    _alert(context, 'Download failed');
   }
 }
 
