@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:document_file_save_plus/document_file_save_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
@@ -133,49 +136,65 @@ _askPermission() async {
   }
 }
 
-_saveImage(String imageUrl, BuildContext context) async {
+_saveImage(String imageUrl, context) async {
   try {
-    await _askPermission();
-    var response = await Dio()
-        .get((imageUrl), options: (Options(responseType: ResponseType.bytes)));
-    final result = await ImageGallerySaver.saveImage(
-      Uint8List.fromList(response.data),
-      quality: 100,
-    );
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      Directory dir = await getApplicationDocumentsDirectory();
+      var pathList = dir.path.split('\\');
+      pathList[pathList.length - 1] = 'Pictures';
+      var picturePath = pathList.join('\\');
+      var round = Random();
+      var netxRound = round.nextInt(100000).toString();
+      var image = await File(
+              join(picturePath, 'megilery_image', 'image$netxRound.jpeg'))
+          .create(recursive: true);
+      var response = await Dio().get((imageUrl),
+          options: (Options(responseType: ResponseType.bytes)));
+      await image.writeAsBytes(Uint8List.fromList(response.data));
+      alert(context, 'Download successful');
+    } else {
+      await _askPermission();
+      var response = await Dio().get((imageUrl),
+          options: (Options(responseType: ResponseType.bytes)));
+      await ImageGallerySaver.saveImage(
+        Uint8List.fromList(response.data),
+        quality: 80,
+      );
+      alert(context, 'Download successful');
+    }
 
-    // print(result);
-    alert(context, 'Download successful');
   } catch (e) {
     // ignore: todo
     // TODO
-    _alert(context, 'Download failed');
+    _alert(context, 'Download fail');
   }
 }
 
 alert(context, response) {
-  showBottomSheet(
-      context: context,
-      builder: (context) {
-        return SnackBar(
-            backgroundColor: Colors.grey.shade200,
-            padding: const EdgeInsets.all(8),
-            elevation: 12,
-            duration: const Duration(seconds: 2),
-            content: response == null
-                ? const Text("Image saved successfully")
-                : const Text("Image not saved"));
-      });
+  return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: Colors.grey.shade200,
+      padding: const EdgeInsets.all(8),
+      elevation: 12,
+      duration: const Duration(seconds: 2),
+      content: response != null
+          ? const Text(
+              "Image saved successfully",
+              style: TextStyle(color: Colors.brown),
+            )
+          : const Text(
+              "Image not saved",
+              style: TextStyle(color: Colors.brown),
+            )));
 }
 
 _alert(context, e) {
-  showBottomSheet(
-      context: context,
-      builder: (context) {
-        return SnackBar(
-            backgroundColor: Colors.grey.shade200,
-            padding: const EdgeInsets.all(8),
-            elevation: 12,
-            duration: const Duration(seconds: 2),
-            content: Text(e.toString()));
-      });
+  return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: Colors.grey.shade200,
+      padding: const EdgeInsets.all(8),
+      elevation: 12,
+      duration: const Duration(seconds: 2),
+      content: Text(
+        e.toString(),
+        style: TextStyle(color: Colors.brown),
+      )));
 }

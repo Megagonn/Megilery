@@ -194,6 +194,7 @@ class _HomeState extends State<Home> {
                       child: RefreshIndicator(
                         onRefresh: () async {
                           setState(() {});
+                          // initState();
                         },
                         child: Column(
                           children: [

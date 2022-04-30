@@ -11,7 +11,7 @@ class Splash extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: AnimatedSplashScreen(
-            splash: const Icon(Icons.home_filled, size: 200,), nextScreen: const Home(),
+            splash: Icon(Icons.home_filled, size: 200, color: Colors.brown.shade600,), nextScreen: const Home(),
             ),
         ),
       ),
