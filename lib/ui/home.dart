@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gallery/model/model.info.dart';
 import 'package:gallery/ui/card.dart';
+import 'package:gallery/ui/auth.dart';
 import 'package:gallery/ui/favourites.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -39,9 +40,7 @@ class _HomeState extends State<Home> {
   var url = 'https://api.pexels.com/v1/curated?page=2&per_page=27';
   getData() async {
     var api = Uri.parse(url);
-    var auth = "563492ad6f91700001000001b6db29ebe1e0450bb881d9d19d7f5e75";
-    // var auth = "563492ad6f9170000100000145f3369b02024112bf1ec64492195a21";
-    // var auth = "563492ad6f9170000100000197ee4c4181cc43e98747111ab3e64435";
+    var auth = AuthKey().auth();
     try {
       var response = await http.get(
         api,
