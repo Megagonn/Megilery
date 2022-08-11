@@ -257,7 +257,7 @@ class _HomeState extends State<Home> {
                                                                 imageProvider,
                                                             fit: BoxFit.cover,
                                                             colorFilter:
-                                                                ColorFilter.mode(
+                                                                const ColorFilter.mode(
                                                                     Colors.transparent,
                                                                     BlendMode
                                                                         .colorBurn)),
@@ -265,10 +265,10 @@ class _HomeState extends State<Home> {
                                                     ),
                                                     placeholder: (context,
                                                             url) =>
-                                                        CircularProgressIndicator(),
+                                                        const Center(child: CircularProgressIndicator()),
                                                     errorWidget:
                                                         (context, url, error) =>
-                                                            Icon(Icons.error),
+                                                            const Center(child: Icon(Icons.error, color: Colors.red)),
                                                   ),
                                         ),
                                       ),

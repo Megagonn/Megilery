@@ -3,7 +3,6 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:document_file_save_plus/document_file_save_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,6 +10,7 @@ import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 
 class PexelCard extends StatefulWidget {
   const PexelCard({Key? key}) : super(key: key);
@@ -40,7 +40,9 @@ class _PexelCardState extends State<PexelCard> {
         ),
         body: Stack(
           children: [
-            Container(
+            ZoomOverlay(
+              twoTouchOnly: false,
+              animationDuration: const Duration(milliseconds: 400),
               child: Image.network(pexel.portrait,
                   fit: BoxFit.cover,
                   height: MediaQuery.of(context).size.height,

@@ -87,7 +87,7 @@ class _SearchState extends State<Search> {
           child: Column(
             children: [
               data.isEmpty
-                  ? const CircularProgressIndicator.adaptive()
+                  ? const Center(child:  CircularProgressIndicator.adaptive())
                   : Scrollbar(
                       child: SizedBox(
                         height: MediaQuery.of(context).size.height - 70,
@@ -156,7 +156,7 @@ class _SearchState extends State<Search> {
                                                                 imageProvider,
                                                             fit: BoxFit.cover,
                                                             colorFilter:
-                                                                ColorFilter.mode(
+                                                                const ColorFilter.mode(
                                                                     Colors.transparent,
                                                                     BlendMode
                                                                         .colorBurn)),
@@ -164,10 +164,10 @@ class _SearchState extends State<Search> {
                                                     ),
                                                     placeholder: (context,
                                                             url) =>
-                                                        CircularProgressIndicator(),
+                                                        const CircularProgressIndicator(),
                                                     errorWidget:
                                                         (context, url, error) =>
-                                                            Icon(Icons.error),
+                                                            const Icon(Icons.error),
                                                   ),
                                                 
                                                 // Image.network(
