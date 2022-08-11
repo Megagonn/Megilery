@@ -193,5 +193,5 @@ _alert(context, e) {
       padding: const EdgeInsets.all(8),
       elevation: 12,
       duration: const Duration(seconds: 2),
-      content: Text(e.toString(), style: TextStyle(color: Colors.brown),)));
+      content: Text(e.toString(), style: const TextStyle(color: Colors.brown),)));
 }
