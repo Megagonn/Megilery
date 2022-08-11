@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gallery/model/model.info.dart';
@@ -85,19 +86,19 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     isLargeScreen();
     isSmallScreen();
-    return SafeArea(
-      child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const Favourites()));
-          },
-          backgroundColor: Colors.brown.shade500,
-          child: const Icon(
-            Icons.favorite_sharp,
-          ),
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const Favourites()));
+        },
+        backgroundColor: Colors.brown.shade500,
+        child: const Icon(
+          Icons.favorite_sharp,
         ),
-        body: OfflineBuilder(
+      ),
+      body: SafeArea(
+        child: OfflineBuilder(
           connectivityBuilder: (context, connectivity, child) {
             final bool connected = connectivity != ConnectivityResult.none;
             return connected
@@ -244,15 +245,31 @@ class _HomeState extends State<Home> {
                                             borderRadius:
                                                 BorderRadius.circular(30),
                                           ),
-                                          child: Image.network(
-                                            data[index].portrait,
-                                            fit: BoxFit.fill,
-                                            errorBuilder:
-                                                (context, obj, error) {
-                                              return const Text(
-                                                  "Error loading image");
-                                            },
-                                          ),
+                                          child: CachedNetworkImage(
+                                                    imageUrl:
+                                                        data[index].portrait,
+                                                    imageBuilder: (context,
+                                                            imageProvider) =>
+                                                        Container(
+                                                      decoration: BoxDecoration(
+                                                        image: DecorationImage(
+                                                            image:
+                                                                imageProvider,
+                                                            fit: BoxFit.cover,
+                                                            colorFilter:
+                                                                ColorFilter.mode(
+                                                                    Colors.transparent,
+                                                                    BlendMode
+                                                                        .colorBurn)),
+                                                      ),
+                                                    ),
+                                                    placeholder: (context,
+                                                            url) =>
+                                                        CircularProgressIndicator(),
+                                                    errorWidget:
+                                                        (context, url, error) =>
+                                                            Icon(Icons.error),
+                                                  ),
                                         ),
                                       ),
                                     ],

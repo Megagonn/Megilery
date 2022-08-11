@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gallery/model/model.info.dart';
@@ -79,92 +80,121 @@ class _SearchState extends State<Search> {
       appBar: AppBar(
         title: Text(widget.searchQuery.toUpperCase()),
       ),
-      body: Container(
-        height: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        child: Column(
-          children: [
-            data.isEmpty
-                ? const CircularProgressIndicator.adaptive()
-                : Scrollbar(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height - 70,
-                      child: SingleChildScrollView(
-                        controller: scrollController,
-                        child: RefreshIndicator(
-                          onRefresh: () async {
-                            setState(() {});
-                          },
-                          child: Column(
-                            children: [
-                              GridView.custom(
-                                physics: const ScrollPhysics(),
-                                shrinkWrap: true,
-                                gridDelegate: SliverWovenGridDelegate.count(
-                                  crossAxisCount: 3,
-                                  crossAxisSpacing: .6,
-                                  mainAxisSpacing: .6,
-                                  pattern: const [
-                                    WovenGridTile(
-                                      2 / 3,
-                                      alignment: AlignmentDirectional.center,
-                                    ),
-                                    WovenGridTile(
-                                      5 / 7,
-                                      crossAxisRatio: .9,
-                                      alignment: AlignmentDirectional.center,
-                                    ),
-                                  ],
-                                ),
-                                childrenDelegate: SliverChildBuilderDelegate(
-                                  ((context, index) {
-                                    return Stack(
-                                      children: [
-                                        InkWell(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const PexelCard(),
-                                                    settings: RouteSettings(
-                                                        arguments:
-                                                            data[index])));
-                                          },
-                                          onLongPress: () {
-                                            _alert(context, index);
-                                          },
-                                          child: Container(
-                                            clipBehavior: Clip.hardEdge,
-                                            padding: const EdgeInsets.all(5),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                            ),
-                                            child: Image.network(
-                                              data[index].portrait,
-                                              fit: BoxFit.fill,
-                                              errorBuilder:
-                                                  (context, obj, error) {
-                                                return const Text(
-                                                    "Error loading image");
-                                              },
-                                            ),
+      body: SafeArea(
+        child: Container(
+          height: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          child: Column(
+            children: [
+              data.isEmpty
+                  ? const CircularProgressIndicator.adaptive()
+                  : Scrollbar(
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height - 70,
+                        child: SingleChildScrollView(
+                          controller: scrollController,
+                          child: RefreshIndicator(
+                            onRefresh: () async {
+                              setState(() {});
+                            },
+                            child: Column(
+                              children: [
+                                GridView.custom(
+                                  physics: const ScrollPhysics(),
+                                  shrinkWrap: true,
+                                  gridDelegate: SliverWovenGridDelegate.count(
+                                    crossAxisCount: 3,
+                                    crossAxisSpacing: .6,
+                                    mainAxisSpacing: .6,
+                                    pattern: const [
+                                      WovenGridTile(
+                                        2 / 3,
+                                        alignment: AlignmentDirectional.center,
+                                      ),
+                                      WovenGridTile(
+                                        5 / 7,
+                                        crossAxisRatio: .9,
+                                        alignment: AlignmentDirectional.center,
+                                      ),
+                                    ],
+                                  ),
+                                  childrenDelegate: SliverChildBuilderDelegate(
+                                    ((context, index) {
+                                      return Stack(
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const PexelCard(),
+                                                      settings: RouteSettings(
+                                                          arguments:
+                                                              data[index])));
+                                            },
+                                            onLongPress: () {
+                                              _alert(context, index);
+                                            },
+                                            child: Container(
+                                                clipBehavior: Clip.hardEdge,
+                                                padding:
+                                                    const EdgeInsets.all(5),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                ),
+                                                child:  CachedNetworkImage(
+                                                    imageUrl:
+                                                        data[index].portrait,
+                                                    imageBuilder: (context,
+                                                            imageProvider) =>
+                                                        Container(
+                                                      decoration: BoxDecoration(
+                                                        image: DecorationImage(
+                                                            image:
+                                                                imageProvider,
+                                                            fit: BoxFit.cover,
+                                                            colorFilter:
+                                                                ColorFilter.mode(
+                                                                    Colors.transparent,
+                                                                    BlendMode
+                                                                        .colorBurn)),
+                                                      ),
+                                                    ),
+                                                    placeholder: (context,
+                                                            url) =>
+                                                        CircularProgressIndicator(),
+                                                    errorWidget:
+                                                        (context, url, error) =>
+                                                            Icon(Icons.error),
+                                                  ),
+                                                
+                                                // Image.network(
+                                                //   data[index].portrait,
+                                                //   fit: BoxFit.fill,
+                                                //   errorBuilder:
+                                                //       (context, obj, error) {
+                                                //     return const Text(
+                                                //         "Error loading image");
+                                                //   },
+                                                // ),
+                                                ),
                                           ),
-                                        ),
-                                      ],
-                                    );
-                                  }),
-                                  childCount: data.length,
+                                        ],
+                                      );
+                                    }),
+                                    childCount: data.length,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-          ],
+            ],
+          ),
         ),
       ),
     );

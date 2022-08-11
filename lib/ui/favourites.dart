@@ -35,102 +35,103 @@ class _FavouritesState extends State<Favourites> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        title: const Text("Favourites"),
-        actions: [
-          PopupMenuButton(
-            itemBuilder: (context) {
-              return [
-                PopupMenuItem(
-                  child: const Text('Clear all'),
-                  onTap: () async {
-                    SharedPreferences sharedPreferences =
-                        await SharedPreferences.getInstance();
-                    sharedPreferences.remove("favourite");
-                    setState(() {});
-                  },
-                )
-              ];
-            },
-            icon: const Icon(Icons.menu),
-          )
-        ],
+    title: const Text("Favourites"),
+    actions: [
+      PopupMenuButton(
+        itemBuilder: (context) {
+          return [
+            PopupMenuItem(
+              child: const Text('Clear all'),
+              onTap: () async {
+                SharedPreferences sharedPreferences =
+                    await SharedPreferences.getInstance();
+                sharedPreferences.remove("favourite");
+                setState(() {});
+              },
+            )
+          ];
+        },
+        icon: const Icon(Icons.menu),
+      )
+    ],
       ),
-      body: Container(
-        height: double.infinity,
-        padding: const EdgeInsets.all(10),
-        child: FutureBuilder(
-            future: getFavourites(),
-            builder: (context, AsyncSnapshot<dynamic> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                    child: CircularProgressIndicator.adaptive());
-              } else {
-                var favourite = snapshot.data;
-                return SingleChildScrollView(
-                  child: GridView.builder(
-                      shrinkWrap: true,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 3,
-                        mainAxisSpacing: 3,
-                        childAspectRatio: 2 / 3,
-                      ),
-                      itemCount: favourite != null ? favourite.length : 1,
-                      itemBuilder: (context, index) {
-                        return favourite != null
-                            ? Stack(
-                                children: [
-                                  Container(
-                                    clipBehavior: Clip.hardEdge,
-                                    padding: const EdgeInsets.all(5),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                    child: Image.network(
-                                      favourite[index],
-                                      fit: BoxFit.fill,
-                                      errorBuilder: (context, obj, error) {
-                                        return const Text(
-                                            "Error loading image");
-                                      },
-                                    ),
+      body: SafeArea(
+        child: Container(
+          height: double.infinity,
+          padding: const EdgeInsets.all(10),
+          child: FutureBuilder(
+          future: getFavourites(),
+          builder: (context, AsyncSnapshot<dynamic> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                  child: CircularProgressIndicator.adaptive());
+            } else {
+              var favourite = snapshot.data;
+              return SingleChildScrollView(
+                child: GridView.builder(
+                    shrinkWrap: true,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 3,
+                      mainAxisSpacing: 3,
+                      childAspectRatio: 2 / 3,
+                    ),
+                    itemCount: favourite != null ? favourite.length : 1,
+                    itemBuilder: (context, index) {
+                      return favourite != null
+                          ? Stack(
+                              children: [
+                                Container(
+                                  clipBehavior: Clip.hardEdge,
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30),
                                   ),
-                                  Positioned(
-                                    bottom: 15,
-                                    left: 72,
-                                    child: CircleAvatar(
-                                      backgroundColor:
-                                          Colors.grey.shade100.withAlpha(100),
-                                      child: IconButton(
-                                        onPressed: () async {
-                                          _saveImage(favourite[index], context);
-                                        },
-                                        icon: Icon(
-                                          Icons.download,
-                                          color: Colors.brown.shade600,
-                                        ),
+                                  child: Image.network(
+                                    favourite[index],
+                                    fit: BoxFit.fill,
+                                    errorBuilder: (context, obj, error) {
+                                      return const Text(
+                                          "Error loading image");
+                                    },
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 15,
+                                  left: 72,
+                                  child: CircleAvatar(
+                                    backgroundColor:
+                                        Colors.grey.shade100.withAlpha(100),
+                                    child: IconButton(
+                                      onPressed: () async {
+                                        _saveImage(favourite[index], context);
+                                      },
+                                      icon: Icon(
+                                        Icons.download,
+                                        color: Colors.brown.shade600,
                                       ),
                                     ),
                                   ),
-                                ],
-                              )
-                            : Container(
-                                color: Colors.brown.shade100,
-                                padding: const EdgeInsets.all(5),
-                                child: const Center(
-                                  child: Text("No favourite added yet"),
                                 ),
-                              );
-                      }),
-                );
-              }
-            }),
+                              ],
+                            )
+                          : Container(
+                              color: Colors.brown.shade100,
+                              padding: const EdgeInsets.all(5),
+                              child: const Center(
+                                child: Text("No favourite added yet"),
+                              ),
+                            );
+                    }),
+              );
+            }
+          }),
+        ),
       ),
-    ));
+    );
   }
 }
 
