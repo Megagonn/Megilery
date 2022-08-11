@@ -14,4 +14,4 @@ User can search, download and save any image of their choice.
 
 
 ## APK file
-- [Get the APK file here:](https://github.com/megagonn/megillery/blob/master/app-release.apk)
+- [Get the APK file here:](https://github.com/megagonn/megilery/blob/master/app-release.apk)
